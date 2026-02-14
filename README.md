@@ -63,7 +63,7 @@ LeetMetric/
 
 1. Clone the repository:
 
-   git clone https://github.com/your-username/LeetMetric.git
+   git clone https://github.com/TanviTater/LeetMetric.git
 
 2. Navigate into the project folder:
 
