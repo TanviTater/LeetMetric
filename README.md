@@ -36,11 +36,11 @@ No frameworks. No libraries. Just core web fundamentals.
 ## 📂 Project Structure
 
 LeetMetric/
-│
-├── index.html     # Main UI layout  
-├── style.css      # Styling and circular progress design  
-├── script.js      # API calls and dynamic rendering  
-└── README.md      # Documentation  
+
+├── index.html     
+├── style.css        
+├── script.js     
+└── README.md      
 
 ---
 
