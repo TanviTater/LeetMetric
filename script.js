@@ -29,8 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             searchButton.textContent = "Searching...";
             searchButton.disabled = true;
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/'
-            const targetUrl = 'https://leetcode.com/graphql/';
             const myHeaders = new Headers();
             myHeaders.append("content-Type", "application/json");
             const graphql = JSON.stringify({
@@ -68,7 +66,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: graphql,
                 redirect: "follow"
             };
-            const response = await fetch(proxyUrl + targetUrl, requestOptions);
+            const response = await fetch("http://localhost:5000/leetcode", requestOptions);
+
             if (!response.ok) {
                 throw new Error("Unable to fetch user details");
             }
@@ -116,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
             (acceptedSubmissions / totalSubmissions) * 100
         ).toFixed(2);
 
-        // Update circles
+        
         updateProgress(solvedEasy, totalEasyQues, easyLabel, easyProgressCircle);
         updateProgress(solvedMedium, totalMediumQues, mediumLabel, mediumProgressCircle);
         updateProgress(solvedHard, totalHardQues, hardLabel, hardProgressCircle);
