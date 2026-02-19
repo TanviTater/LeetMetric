@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const hardLabel = document.getElementById("hard-label");
     const cardStatsContainer = document.querySelector(".stats-card");
 
-
     function validateUsername(username) {
         if (username.trim() === "") {
             alert("Username cannot be empty");
@@ -28,84 +27,80 @@ document.addEventListener("DOMContentLoaded", function () {
         return isMatching;
     }
 
-
     async function fetchUserDetails(username) {
 
         try {
-
             searchButton.textContent = "Searching...";
             searchButton.disabled = true;
 
-            const graphql = {
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const graphql = JSON.stringify({
                 query: `
-                query userSessionProgress($username: String!) {
-                    allQuestionsCount {
-                        difficulty
-                        count
-                    }
-                    matchedUser(username: $username) {
-                        profile {
-                            ranking
+                    query userSessionProgress($username: String!) {
+                        allQuestionsCount {
+                            difficulty
+                            count
                         }
-                        submitStats {
-                            acSubmissionNum {
-                                difficulty
-                                count
-                                submissions
+                        matchedUser(username: $username) {
+                            profile {
+                                ranking
                             }
-                            totalSubmissionNum {
-                                difficulty
-                                count
-                                submissions
+                            submitStats {
+                                acSubmissionNum {
+                                    difficulty
+                                    count
+                                    submissions
+                                }
+                                totalSubmissionNum {
+                                    difficulty
+                                    count
+                                    submissions
+                                }
                             }
                         }
                     }
-                }
                 `,
                 variables: { username: username }
-            };
-
-            const response = await fetch("http://localhost:5000/leetcode", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(graphql)
             });
 
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: graphql
+            };
+
+            const response = await fetch(
+                "https://corsproxy.io/?https://leetcode.com/graphql/",
+                requestOptions
+            );
+
             if (!response.ok) {
-                throw new Error("Server error. Make sure backend is running.");
+                throw new Error("Unable to fetch user details");
             }
 
             const parsedData = await response.json();
 
-            if (!parsedData.data || !parsedData.data.matchedUser) {
-                throw new Error("User not found.");
+            if (!parsedData.data.matchedUser) {
+                throw new Error("User not found");
             }
 
             displayUserData(parsedData);
 
         } catch (error) {
-
-            alert(error.message);
-
-            statsContainer.classList.add("hidden");
-            cardStatsContainer.classList.add("hidden");
-
+            statsContainer.innerHTML = `<p>${error.message}</p>`;
         } finally {
-
             searchButton.textContent = "Search";
             searchButton.disabled = false;
         }
     }
-
 
     function updateProgress(solved, total, label, circle) {
         const progressDegree = (solved / total) * 100;
         circle.style.setProperty("--progress-degree", `${progressDegree}%`);
         label.textContent = `${solved}/${total}`;
     }
-
 
     function displayUserData(parsedData) {
 
@@ -127,10 +122,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const ranking = parsedData.data.matchedUser.profile.ranking;
 
-        const acceptanceRate = totalSubmissions === 0
-            ? 0
-            : ((acceptedSubmissions / totalSubmissions) * 100).toFixed(2);
-
+        const acceptanceRate = (
+            (acceptedSubmissions / totalSubmissions) * 100
+        ).toFixed(2);
 
         updateProgress(solvedEasy, totalEasyQues, easyLabel, easyProgressCircle);
         updateProgress(solvedMedium, totalMediumQues, mediumLabel, mediumProgressCircle);
@@ -143,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
             { label: "Total Solved", value: solvedTotal },
             { label: "Total Questions", value: allQuestions[0].count },
             { label: "Ranking", value: ranking },
-            { label: "Acceptance Rate", value: acceptanceRate + "%" }
+            { label: "Acceptance Rate", value: acceptanceRate + "%" },
         ];
 
         cardStatsContainer.innerHTML = cardsData.map(card =>
@@ -154,10 +148,8 @@ document.addEventListener("DOMContentLoaded", function () {
         ).join("");
     }
 
-
     searchButton.addEventListener("click", function () {
-        const username = usernameInput.value.trim();
-
+        const username = usernameInput.value;
         if (validateUsername(username)) {
             fetchUserDetails(username);
         }
