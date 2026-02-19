@@ -10,11 +10,12 @@ app.post("/leetcode", async (req, res) => {
     try {
         console.log("Incoming request body:", req.body);
 
-        const response = await fetch("https://leetcode.com/graphql/", {
+        const response = await fetch("https://leetcode.com/graphql", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Referer": "https://leetcode.com"
+                "User-Agent": "Mozilla/5.0",
+                "Referer": "https://leetcode.com/"
             },
             body: JSON.stringify(req.body),
         });
@@ -27,7 +28,7 @@ app.post("/leetcode", async (req, res) => {
 
     } catch (error) {
         console.error("Server Error:", error);
-        res.status(500).json({ error: "Failed to fetch data" });
+        res.status(500).json({ error: error.message });
     }
 });
 
